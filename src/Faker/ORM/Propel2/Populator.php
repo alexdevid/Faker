@@ -43,6 +43,9 @@ class Populator
             $entity->mergeModifiersWith($customModifiers);
         }
         $class = $entity->getClass();
+        for($i = 0; $i < $number; $i++) {
+            $this->models[] = $entity;
+        }
         $this->entities[$class] = $entity;
         $this->quantities[$class] = $number;
     }
@@ -63,10 +66,8 @@ class Populator
         Propel::disableInstancePooling();
         $insertedEntities = array();
         $con->beginTransaction();
-        foreach ($this->quantities as $class => $number) {
-            for ($i=0; $i < $number; $i++) {
-                $insertedEntities[$class][]= $this->entities[$class]->execute($con, $insertedEntities);
-            }
+        foreach($this->models as $model) {
+            $insertedEntities[]= $model->execute($con, $insertedEntities);
         }
         $con->commit();
         if ($isInstancePoolingEnabled) {
